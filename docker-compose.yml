@@ -1,0 +1,38 @@
+version: "3.8"
+services:
+  backend:
+    container_name: backend
+    image: golang:1.21.3
+    ports:
+      - 8080:8080
+    volumes:
+      - /Users/chrischen/Development/Project/food-ordering-system/:/mnt/food-ordering-system
+    command: sleep infinity
+    env_file:
+      - ./.env
+    working_dir: /mnt/food-ordering-system
+    depends_on:
+      database:
+        condition: service_healthy
+  
+  database:
+    container_name: database
+    image: postgres:15.4
+    ports:
+      - 5434:5432
+    env_file:
+      - ./.env
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgresql-data:
+
+networks:
+  default:
+    driver: bridge
+    external: true
+    name: food-ordering-system
